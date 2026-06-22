@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#1b4fd8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://www.gstatic.com; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebase.com wss://*.firebaseio.com; img-src 'self' data:; object-src 'none'; base-uri 'self';">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>シミュレーション - 資産管理ツール</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/icon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-brand">💰 資産管理</div>
+    <ul class="nav-links">
+      <li><a href="index.html">ダッシュボード</a></li>
+      <li><a href="input.html">資産入力</a></li>
+      <li><a href="history.html">推移グラフ</a></li>
+      <li><a href="simulation.html" class="active">シミュレーション</a></li>
+    </ul>
+  </nav>
+
+  <main class="container">
+    <div class="page-header">
+      <h1 class="page-title">将来資産シミュレーション</h1>
+      <span class="total-display">投資信託合計: <span id="fundTotal">¥0</span></span>
+    </div>
+
+    <div class="info-banner">
+      <strong>📈 シミュレーションの仕組み</strong><br>
+      <strong>確定値グラフ：</strong>複利計算式 <code>FV = P×(1+r)^n + C×[(1+r)^n − 1] / r</code> で将来資産を試算。
+      P=元本 / C=毎月積立 / r=月次リターン率 / n=積立月数<br>
+      <strong>確率分布グラフ：</strong>月次リターン R〜N(μ, σ) をモンテカルロ法で5,000回試行し、上位・中央・下位シナリオを可視化。
+      各ファンドカードの <strong>年率リスク・σ</strong> でブレ幅を設定できます（例：株式インデックス ≒ 15〜20%）。
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">投資信託の管理</h2>
+      <p class="sim-fund-note">
+        残高は「<a href="input.html">資産入力</a>」タブで管理されます。ここでは積立額と想定年利を設定してください。
+      </p>
+      <div id="fundList" class="fund-cards-grid"></div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">シミュレーション設定</h2>
+      <div class="sim-controls-row">
+        <div class="form-group sim-param-group">
+          <label for="simYears">シミュレーション期間（年）</label>
+          <input type="number" id="simYears" value="20" min="1" max="60">
+        </div>
+        <button type="button" id="runSimBtn" class="btn btn-primary btn-run">
+          🚀 シミュレーション実行
+        </button>
+      </div>
+      <p class="sim-disclaimer">
+        ※ 投資信託以外の資産（現金・株式など）は変動なしとして合算されます。<br>
+        ※ この結果は参考値であり、将来の実際の運用成果を保証するものではありません。
+      </p>
+    </div>
+
+    <div id="simResultSection" class="is-hidden">
+      <div class="sim-result-cards">
+        <div class="sim-result-card">
+          <div class="sim-result-label">最終資産（合計）</div>
+          <div class="sim-result-value" id="simFinalTotal">-</div>
+        </div>
+        <div class="sim-result-card">
+          <div class="sim-result-label">総積立金額</div>
+          <div class="sim-result-value" id="simTotalContrib">-</div>
+        </div>
+        <div class="sim-result-card">
+          <div class="sim-result-label">運用益（複利効果）</div>
+          <div class="sim-result-value green" id="simTotalGain">-</div>
+        </div>
+        <div class="sim-result-card">
+          <div class="sim-result-label">累積リターン率</div>
+          <div class="sim-result-value green" id="simReturnRate">-</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">将来資産推移グラフ（複利計算・確定値）</h2>
+        <div class="chart-container-xl">
+          <canvas id="simChart"></canvas>
+        </div>
+      </div>
+
+      <!-- モンテカルロ確率分布グラフ -->
+      <div class="card">
+        <h2 class="card-title">確率分布グラフ（モンテカルロ法）</h2>
+        <div class="mc-band-legend">
+          <span class="mc-legend-item">
+            <span class="mc-legend-swatch mc-swatch-outer"></span>上位/下位 5%
+          </span>
+          <span class="mc-legend-item">
+            <span class="mc-legend-swatch mc-swatch-inner"></span>上位/下位 30%
+          </span>
+          <span class="mc-legend-item">
+            <span class="mc-legend-swatch mc-swatch-median"></span>中央値（50%）
+          </span>
+        </div>
+        <div class="chart-container-xl">
+          <canvas id="mcChart"></canvas>
+        </div>
+        <p class="mc-nsims-note" id="mcNsimsNote"></p>
+      </div>
+
+      <!-- シナリオ別最終資産 -->
+      <div class="mc-scenario-section">
+        <h3 class="mc-scenario-heading">最終年のシナリオ別予測</h3>
+        <div class="mc-scenario-cards">
+          <div class="mc-scenario-card mc-scenario-bad">
+            <div class="mc-scenario-label">悲観シナリオ</div>
+            <div class="mc-scenario-value" id="mcP5">-</div>
+            <div class="mc-scenario-prob">下位 5%</div>
+          </div>
+          <div class="mc-scenario-card mc-scenario-lower">
+            <div class="mc-scenario-label">やや悲観</div>
+            <div class="mc-scenario-value" id="mcP30">-</div>
+            <div class="mc-scenario-prob">下位 30%</div>
+          </div>
+          <div class="mc-scenario-card mc-scenario-mid">
+            <div class="mc-scenario-label">中央値</div>
+            <div class="mc-scenario-value" id="mcP50">-</div>
+            <div class="mc-scenario-prob">50% ライン</div>
+          </div>
+          <div class="mc-scenario-card mc-scenario-upper">
+            <div class="mc-scenario-label">やや楽観</div>
+            <div class="mc-scenario-value" id="mcP70">-</div>
+            <div class="mc-scenario-prob">上位 30%</div>
+          </div>
+          <div class="mc-scenario-card mc-scenario-good">
+            <div class="mc-scenario-label">楽観シナリオ</div>
+            <div class="mc-scenario-value" id="mcP95">-</div>
+            <div class="mc-scenario-prob">上位 5%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/firebase-config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/assets.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/simulation.js"></script>
+  <script src="js/simulation-ui.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
