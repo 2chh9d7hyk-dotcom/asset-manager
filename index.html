@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#1b4fd8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://www.gstatic.com; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebase.com wss://*.firebaseio.com; img-src 'self' data:; object-src 'none'; base-uri 'self';">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>ダッシュボード - 資産管理ツール</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/icon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-brand">💰 資産管理</div>
+    <ul class="nav-links">
+      <li><a href="index.html" class="active">ダッシュボード</a></li>
+      <li><a href="input.html">資産入力</a></li>
+      <li><a href="history.html">推移グラフ</a></li>
+      <li><a href="simulation.html">シミュレーション</a></li>
+    </ul>
+  </nav>
+
+  <main class="container">
+    <div class="page-header">
+      <h1 class="page-title">ダッシュボード</h1>
+      <div class="page-meta">
+        <span id="marketStatus" class="market-status closed">東証 閉場</span>
+        <span id="healthScore"  class="health-badge score-none">データなし</span>
+      </div>
+      <a href="input.html" class="btn btn-primary">＋ 資産を追加</a>
+    </div>
+
+    <div class="summary-cards">
+      <div class="card summary-card">
+        <div class="card-label">総資産</div>
+        <div class="card-value" id="totalAssets">¥0</div>
+        <div class="card-sub" id="assetCount">データなし</div>
+      </div>
+      <div class="card summary-card">
+        <div class="card-label">現金・預金</div>
+        <div class="card-value" id="cashTotal">¥0</div>
+      </div>
+      <div class="card summary-card">
+        <div class="card-label">投資資産合計</div>
+        <div class="card-value" id="investTotal">¥0</div>
+        <div class="card-sub">株式＋信託＋不動産＋暗号</div>
+      </div>
+      <div class="card summary-card">
+        <div class="card-label">最終更新日</div>
+        <div class="card-value card-value--sm" id="lastUpdate">-</div>
+      </div>
+    </div>
+
+    <div class="charts-grid">
+      <div class="card chart-card">
+        <h2 class="card-title">資産構成</h2>
+        <div class="chart-wrapper">
+          <canvas id="pieChart"></canvas>
+        </div>
+        <div id="pieChartLegend" class="chart-legend"></div>
+      </div>
+      <div class="card chart-card">
+        <h2 class="card-title">カテゴリー別内訳</h2>
+        <div id="categoryBreakdown" class="breakdown-list">
+          <p class="empty-message">データがありません</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">保有資産一覧</h2>
+      <div id="assetList">
+        <p class="empty-message">
+          資産データがありません。<a href="input.html">資産を追加する →</a>
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/firebase-config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/assets.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

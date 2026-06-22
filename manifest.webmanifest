@@ -1,0 +1,14 @@
+{
+  "name": "資産管理ツール",
+  "short_name": "資産管理",
+  "description": "個人資産を管理・シミュレーションするアプリ",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f2f4f7",
+  "theme_color": "#1b4fd8",
+  "lang": "ja",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

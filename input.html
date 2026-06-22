@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#1b4fd8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://www.gstatic.com; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebase.com wss://*.firebaseio.com; img-src 'self' data:; object-src 'none'; base-uri 'self';">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>資産入力 - 資産管理ツール</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/icon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-brand">💰 資産管理</div>
+    <ul class="nav-links">
+      <li><a href="index.html">ダッシュボード</a></li>
+      <li><a href="input.html" class="active">資産入力</a></li>
+      <li><a href="history.html">推移グラフ</a></li>
+      <li><a href="simulation.html">シミュレーション</a></li>
+    </ul>
+  </nav>
+
+  <main class="container">
+    <div class="page-header">
+      <h1 class="page-title">資産入力</h1>
+      <div class="total-display">総資産: <span id="totalDisplay">¥0</span></div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title" id="formTitle">資産を追加</h2>
+      <form id="assetForm">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="name">資産名 <span class="required-mark">*</span></label>
+            <input type="text" id="name" placeholder="例: 三菱UFJ銀行（普通）" maxlength="100" required>
+          </div>
+          <div class="form-group">
+            <label for="category">カテゴリー</label>
+            <select id="category"></select>
+          </div>
+          <div class="form-group">
+            <label for="amount">金額（円） <span class="required-mark">*</span></label>
+            <input type="number" id="amount" placeholder="1000000" min="0" max="999999999999" step="1" required>
+          </div>
+          <div class="form-group">
+            <label for="date">日付</label>
+            <input type="date" id="date">
+          </div>
+
+          <div class="form-group is-hidden" id="fundContribGroup">
+            <label for="monthlyContribution">毎月の積立額（円）</label>
+            <input type="number" id="monthlyContribution" placeholder="33333" min="0" max="10000000" step="1000" value="0">
+          </div>
+          <div class="form-group is-hidden" id="fundReturnGroup">
+            <label for="expectedAnnualReturn">想定年利（%）</label>
+            <input type="number" id="expectedAnnualReturn" placeholder="7.0" min="-50" max="100" step="0.1" value="7.0">
+          </div>
+
+          <div class="form-group full-width">
+            <label for="note">メモ（任意）</label>
+            <textarea id="note" placeholder="口座番号・補足情報など" maxlength="500"></textarea>
+          </div>
+        </div>
+        <div id="fundHint" class="info-banner fund-hint-banner is-hidden">
+          💡 積立設定は「シミュレーション」タブで将来資産の試算に使われます。
+        </div>
+        <div class="form-actions">
+          <button type="submit" id="submitBtn" class="btn btn-primary">追加する</button>
+          <button type="button" id="cancelBtn" class="btn btn-secondary is-hidden">キャンセル</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="action-row">
+      <button type="button" id="saveSnapshotBtn" class="btn btn-success">📸 今月のスナップショットを保存</button>
+      <button type="button" id="loadSampleBtn"   class="btn btn-outline">📂 サンプルデータを追加</button>
+    </div>
+
+    <div class="info-banner info-banner-yellow">
+      <strong>💡 スナップショットについて</strong><br>
+      「今月のスナップショットを保存」を押すと現時点の資産状況が記録されます。
+      毎月1回押すことで「推移グラフ」に月次変化が表示されます。
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">登録済み資産一覧</h2>
+      <div class="asset-table-wrapper">
+        <table class="asset-table">
+          <thead>
+            <tr>
+              <th>カテゴリー</th>
+              <th>資産名</th>
+              <th class="text-right">金額</th>
+              <th>日付</th>
+              <th>メモ</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="assetTableBody">
+            <tr><td colspan="6" class="empty-message">データがありません</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/firebase-config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/assets.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/input.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

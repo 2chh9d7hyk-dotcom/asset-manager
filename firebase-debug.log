@@ -1,0 +1,39 @@
+[debug] [2026-06-22T14:10:41.773Z] ----------------------------------------------------------------------
+[debug] [2026-06-22T14:10:41.776Z] Command:       C:\Program Files\node.exe C:\Users\rai\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --token 1//04GA_f6pCclRDCgYIARAAGAQSNwF-L9Ir36P00vL8T8wTfOnFmBwV9_C8rM1QxLXpXGeiMwS8Zf9VwJuLOn9_fXlc
+[debug] [2026-06-22T14:10:41.777Z] CLI Version:   15.22.0
+[debug] [2026-06-22T14:10:41.777Z] Platform:      win32
+[debug] [2026-06-22T14:10:41.777Z] Node Version:  v24.17.0
+[debug] [2026-06-22T14:10:41.777Z] Detected Agent: unknown
+[debug] [2026-06-22T14:10:41.777Z] Time:          Mon Jun 22 2026 23:10:41 GMT+0900 (日本標準時)
+[debug] [2026-06-22T14:10:41.777Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-06-22T14:10:41.781Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2026-06-22T14:10:43.681Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-06-22T14:10:43.682Z] > authorizing via --token option
+[warn] !  Authenticating with `--token` is deprecated and will be removed in a future major version of `firebase-tools`. Instead, use a service account key with `GOOGLE_APPLICATION_CREDENTIALS`: https://cloud.google.com/docs/authentication/getting-started 
+[debug] [2026-06-22T14:10:43.683Z] [iam] checking project claudecode-39d5c for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2026-06-22T14:10:43.684Z] No OAuth tokens found
+[debug] [2026-06-22T14:10:43.684Z] No OAuth tokens found
+[debug] [2026-06-22T14:10:43.685Z] > refreshing access token with scopes: []
+[debug] [2026-06-22T14:10:43.689Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-06-22T14:10:43.689Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[error] Authentication Error: Your credentials are no longer valid. Please run firebase login --reauth
+
+For CI servers and headless environments, generate a new token with firebase login:ci
+[debug] [2026-06-22T14:10:43.846Z] [iam] error while checking permissions, command may fail: Authentication Error: Your credentials are no longer valid. Please run firebase login --reauth
+
+For CI servers and headless environments, generate a new token with firebase login:ci
+[debug] [2026-06-22T14:10:43.848Z] No OAuth tokens found
+[debug] [2026-06-22T14:10:43.849Z] No OAuth tokens found
+[debug] [2026-06-22T14:10:43.849Z] > refreshing access token with scopes: []
+[debug] [2026-06-22T14:10:43.850Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-06-22T14:10:43.850Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[error] Authentication Error: Your credentials are no longer valid. Please run firebase login --reauth
+
+For CI servers and headless environments, generate a new token with firebase login:ci
+[debug] [2026-06-22T14:10:43.914Z] Authentication Error: Your credentials are no longer valid. Please run firebase login --reauth
+
+For CI servers and headless environments, generate a new token with firebase login:ci
+[error] 
+[error] Error: Assertion failed: resolving hosting target of a site with no site name or target name. This should have caused an error earlier
+[debug] [2026-06-22T14:10:44.140Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200

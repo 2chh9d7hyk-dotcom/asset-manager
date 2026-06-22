@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#1b4fd8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://www.gstatic.com; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebase.com wss://*.firebaseio.com; img-src 'self' data:; object-src 'none'; base-uri 'self';">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>推移グラフ - 資産管理ツール</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/icon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-brand">💰 資産管理</div>
+    <ul class="nav-links">
+      <li><a href="index.html">ダッシュボード</a></li>
+      <li><a href="input.html">資産入力</a></li>
+      <li><a href="history.html" class="active">推移グラフ</a></li>
+      <li><a href="simulation.html">シミュレーション</a></li>
+    </ul>
+  </nav>
+
+  <main class="container">
+    <div class="page-header">
+      <h1 class="page-title">資産推移グラフ</h1>
+      <a href="input.html" class="btn btn-outline">📸 スナップショットを追加</a>
+    </div>
+
+    <div id="historyContent">
+      <div id="historySummary"></div>
+
+      <div class="card">
+        <h2 class="card-title">総資産の推移</h2>
+        <div class="chart-container-lg">
+          <canvas id="lineChart"></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">カテゴリー別推移</h2>
+        <div class="chart-container-lg">
+          <canvas id="barChart"></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">月次データ一覧</h2>
+        <div class="asset-table-wrapper">
+          <table class="asset-table">
+            <thead>
+              <tr>
+                <th>年月</th>
+                <th class="text-right">総資産</th>
+                <th class="text-right">前月比</th>
+                <th class="text-right">現金・預金</th>
+                <th class="text-right">株式</th>
+                <th class="text-right">投資信託</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="snapshotTableBody">
+              <tr><td colspan="7" class="empty-message">データがありません</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/firebase-config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/assets.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/history.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
