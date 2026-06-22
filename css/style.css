@@ -1,0 +1,1305 @@
+/* ============================================================
+   style.css — Financial Dashboard (Light Theme)
+   Design: Clean, bright, professional — modeled after
+           Japanese financial data UIs (fund/stock portals)
+   Font: Inter + Noto Sans JP
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800&family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap');
+
+/* ──────────────────────────────────────────────────────────
+   デザイントークン
+   ────────────────────────────────────────────────────────── */
+:root {
+  /* ── 背景レイヤー ─────────────────────────────────────── */
+  --bg-base:    #f2f4f7;   /* ページ背景（淡いブルーグレー）*/
+  --bg-card:    #ffffff;   /* カード */
+  --bg-raised:  #f7f8fa;   /* テーブルヘッダー・フッター */
+  --bg-input:   #ffffff;   /* フォーム入力欄 */
+  --bg-nav:     #ffffff;   /* ナビゲーション */
+
+  /* ── ボーダー ─────────────────────────────────────────── */
+  --border:     #e2e6ec;   /* デフォルト */
+  --border-em:  #c8d0dc;   /* 強調（hover / focus） */
+
+  /* ── テキスト ─────────────────────────────────────────── */
+  --text-hi:    #1a1f36;   /* 最高コントラスト — 金額・見出し */
+  --text-md:    #4e5878;   /* 中間 — 説明・ラベル */
+  --text-lo:    #9aa3b8;   /* 低コントラスト — ヒント・無効 */
+  --text-label: #6b7591;   /* UPPERCASE ラベル */
+
+  /* ── アクセント ─────────────────────────────────────────── */
+  --blue:       #1b4fd8;   /* ネイビーブルー（プライマリ）*/
+  --blue-lt:    #2563eb;
+  --blue-dim:   rgba(27,79,216,0.08);
+  --blue-rim:   rgba(27,79,216,0.20);
+
+  --teal:       #0d7d6c;
+  --teal-lt:    #0f9b87;
+  --teal-dim:   rgba(13,125,108,0.08);
+
+  --gold:       #b07d10;
+  --gold-lt:    #c99216;
+  --gold-dim:   rgba(176,125,16,0.08);
+
+  --rose:       #c0294a;
+  --rose-lt:    #e03060;
+  --rose-dim:   rgba(192,41,74,0.08);
+
+  --purple:     #6247aa;
+  --purple-lt:  #7c5ec9;
+
+  --slate:      #4a6080;
+  --slate-lt:   #607898;
+
+  /* ── 状態カラー（日本の金融UI: 上昇=赤、下落=青緑）── */
+  --positive:   #e03060;   /* 上昇・プラス — 鮮やかな赤 */
+  --negative:   #0d7d6c;   /* 下落・マイナス — ティール */
+
+  /* ── チャートパレット ─────────────────────────────────── */
+  --chart-cash:    #2563eb;
+  --chart-stock:   #0f9b87;
+  --chart-fund:    #c99216;
+  --chart-estate:  #7c5ec9;
+  --chart-crypto:  #e03060;
+  --chart-other:   #607898;
+
+  /* ── スペーシングスケール（8pt grid）────────────────── */
+  --s1:  4px;
+  --s2:  8px;
+  --s3:  12px;
+  --s4:  16px;
+  --s5:  20px;
+  --s6:  24px;
+  --s8:  32px;
+  --s10: 40px;
+
+  /* ── 角丸 ───────────────────────────────────────────────── */
+  --r:    8px;
+  --r-sm: 6px;
+  --r-xs: 4px;
+  --r-pill: 100px;
+
+  /* ── ナビ高さ ─────────────────────────────────────────── */
+  --nav-h: 60px;
+
+  /* ── シャドウ ─────────────────────────────────────────── */
+  --shadow-card: 0 1px 4px rgba(30,40,80,0.07), 0 0 0 1px var(--border);
+  --shadow-hover: 0 4px 16px rgba(30,40,80,0.10), 0 0 0 1px var(--border-em);
+}
+
+/* ──────────────────────────────────────────────────────────
+   リセット & ベース
+   ────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', 'Noto Sans JP', 'Hiragino Kaku Gothic ProN',
+               -apple-system, BlinkMacSystemFont, sans-serif;
+  font-feature-settings: 'kern' 1, 'liga' 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg-base);
+  color: var(--text-hi);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a {
+  color: var(--blue-lt);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+a:hover { color: var(--blue); }
+
+code {
+  font-family: 'SF Mono', 'Cascadia Code', 'Fira Mono', monospace;
+  font-size: 0.82em;
+  background-color: var(--blue-dim);
+  color: var(--blue);
+  padding: 2px 6px;
+  border-radius: var(--r-xs);
+  border: 1px solid var(--blue-rim);
+}
+
+/* ──────────────────────────────────────────────────────────
+   ナビゲーションバー
+   ────────────────────────────────────────────────────────── */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  height: var(--nav-h);
+  background-color: rgba(255,255,255,0.88);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  backdrop-filter: blur(20px) saturate(160%);
+  border-bottom: 1px solid rgba(226,230,236,0.8);
+  padding: 0 var(--s8);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s6);
+  box-shadow: 0 1px 8px rgba(30,40,80,0.07), 0 0 0 0.5px rgba(30,40,80,0.04);
+}
+
+.nav-brand {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--blue);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 2px;
+}
+
+.nav-links a {
+  display: block;
+  padding: 7px 14px;
+  border-radius: var(--r-sm);
+  font-size: 0.84rem;
+  font-weight: 500;
+  color: var(--text-md);
+  letter-spacing: 0.01em;
+  transition: color 0.15s, background-color 0.15s;
+}
+.nav-links a:hover {
+  color: var(--blue);
+  background-color: var(--blue-dim);
+}
+.nav-links a.active {
+  color: var(--blue);
+  background-color: var(--blue-dim);
+  font-weight: 600;
+  position: relative;
+}
+.nav-links a.active::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 18px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--blue-lt), var(--blue));
+  border-radius: 1px;
+}
+
+/* ──────────────────────────────────────────────────────────
+   ページレイアウト
+   ────────────────────────────────────────────────────────── */
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: var(--s8) var(--s8) 80px;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s4);
+  margin-bottom: var(--s6);
+  flex-wrap: wrap;
+}
+
+.page-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-hi);
+  letter-spacing: -0.02em;
+}
+
+/* ──────────────────────────────────────────────────────────
+   カード
+   ────────────────────────────────────────────────────────── */
+.card {
+  background-color: var(--bg-card);
+  border-radius: var(--r);
+  padding: var(--s6);
+  margin-bottom: var(--s4);
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.15s;
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-label);
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  margin-bottom: var(--s5);
+}
+
+.card-title::before {
+  content: '';
+  display: block;
+  width: 3px;
+  height: 12px;
+  background: linear-gradient(180deg, var(--blue-lt) 0%, var(--blue) 100%);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* ──────────────────────────────────────────────────────────
+   サマリーカード（KPI グリッド）
+   ────────────────────────────────────────────────────────── */
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: var(--s4);
+  margin-bottom: var(--s4);
+}
+
+.summary-card {
+  padding: var(--s5) var(--s6);
+  border-top: 3px solid var(--blue);
+  border-radius: var(--r);
+  transition: box-shadow 0.15s;
+}
+.summary-card:hover { box-shadow: var(--shadow-hover); }
+
+.card-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-label);
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  margin-bottom: var(--s3);
+}
+
+.card-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-hi);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.card-sub {
+  font-size: 0.72rem;
+  color: var(--text-lo);
+  margin-top: var(--s1);
+  font-weight: 400;
+}
+
+/* ──────────────────────────────────────────────────────────
+   グラフグリッド
+   ────────────────────────────────────────────────────────── */
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s4);
+  margin-bottom: var(--s4);
+}
+
+@media (max-width: 820px) {
+  .charts-grid { grid-template-columns: 1fr; }
+}
+
+.chart-card { min-height: 380px; }
+
+.chart-wrapper {
+  position: relative;
+  height: 210px;
+  margin-bottom: var(--s5);
+}
+
+.chart-container-lg {
+  position: relative;
+  height: 380px;
+}
+
+.empty-chart-msg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-lo);
+  font-size: 0.84rem;
+  letter-spacing: 0.02em;
+}
+
+/* ──────────────────────────────────────────────────────────
+   ドーナツグラフ 凡例
+   ────────────────────────────────────────────────────────── */
+.chart-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.legend-item {
+  display: grid;
+  grid-template-columns: 8px 1fr auto auto;
+  align-items: center;
+  column-gap: 10px;
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.legend-label {
+  font-size: 0.83rem;
+  color: var(--text-md);
+  font-weight: 400;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.legend-value {
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: var(--text-hi);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.legend-pct {
+  font-size: 0.72rem;
+  color: var(--text-lo);
+  min-width: 38px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ──────────────────────────────────────────────────────────
+   内訳プログレスバー
+   ────────────────────────────────────────────────────────── */
+.breakdown-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.breakdown-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+  gap: var(--s4);
+}
+
+.breakdown-header span:first-child {
+  font-size: 0.84rem;
+  color: var(--text-md);
+}
+
+.breakdown-amount {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text-hi);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.progress-bar {
+  height: 4px;
+  background-color: var(--bg-base);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 2px;
+  opacity: 0.85;
+  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.breakdown-pct {
+  font-size: 0.67rem;
+  color: var(--text-lo);
+  text-align: right;
+  margin-top: var(--s1);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ──────────────────────────────────────────────────────────
+   テーブル
+   ────────────────────────────────────────────────────────── */
+.asset-table-wrapper { overflow-x: auto; }
+
+.asset-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.asset-table th {
+  padding: 10px 16px;
+  text-align: left;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--text-label);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background-color: var(--bg-raised);
+  border-bottom: 2px solid var(--border);
+  white-space: nowrap;
+}
+
+.asset-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.875rem;
+  color: var(--text-hi);
+  vertical-align: middle;
+}
+
+.asset-table tbody tr:last-child td { border-bottom: none; }
+
+.asset-table tbody tr:hover td {
+  background-color: #f4f7ff;
+}
+
+.asset-table tfoot td {
+  padding: 12px 16px;
+  background-color: var(--bg-raised);
+  border-top: 2px solid var(--border-em);
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-hi);
+}
+
+.text-right  { text-align: right  !important; }
+.text-center { text-align: center !important; }
+
+.amount-cell {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.015em;
+}
+
+.note-cell {
+  color: var(--text-lo);
+  font-size: 0.78rem;
+  font-weight: 400;
+}
+
+.action-cell { white-space: nowrap; }
+
+/* ──────────────────────────────────────────────────────────
+   カテゴリーバッジ
+   ────────────────────────────────────────────────────────── */
+.category-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s1);
+  padding: 3px 8px;
+  border-radius: var(--r-xs);
+  font-size: 0.71rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+
+/* ──────────────────────────────────────────────────────────
+   ボタン
+   ────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  padding: 8px 18px;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  font-size: 0.84rem;
+  font-weight: 600;
+  font-family: inherit;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  cursor: pointer;
+  white-space: nowrap;
+  -webkit-user-select: none;
+  user-select: none;
+  transition: background-color 0.14s, color 0.14s, border-color 0.14s, box-shadow 0.14s;
+}
+
+.btn:active { opacity: 0.80; transform: scale(0.985); }
+
+.btn-primary {
+  background: linear-gradient(160deg, #3070f5 0%, var(--blue) 65%);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 1px 3px rgba(27,79,216,0.22), inset 0 1px 0 rgba(255,255,255,0.12);
+}
+.btn-primary:hover {
+  background: linear-gradient(160deg, #4d85f7 0%, var(--blue-lt) 65%);
+  box-shadow: 0 3px 10px rgba(27,79,216,0.32), inset 0 1px 0 rgba(255,255,255,0.15);
+}
+
+.btn-success {
+  background-color: var(--teal);
+  color: #fff;
+  border-color: transparent;
+}
+.btn-success:hover { background-color: var(--teal-lt); }
+
+.btn-danger {
+  background-color: transparent;
+  color: var(--rose);
+  border-color: var(--border);
+}
+.btn-danger:hover {
+  background-color: var(--rose-dim);
+  border-color: var(--rose);
+  color: var(--rose);
+}
+
+.btn-secondary {
+  background-color: var(--bg-raised);
+  color: var(--text-md);
+  border-color: var(--border);
+}
+.btn-secondary:hover {
+  color: var(--text-hi);
+  border-color: var(--border-em);
+  background-color: var(--bg-base);
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: var(--text-md);
+  border-color: var(--border);
+}
+.btn-outline:hover {
+  color: var(--blue);
+  border-color: var(--blue);
+  background-color: var(--blue-dim);
+}
+
+.btn-sm { padding: 5px 11px; font-size: 0.76rem; }
+
+/* ──────────────────────────────────────────────────────────
+   フォーム
+   ────────────────────────────────────────────────────────── */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--s5);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+}
+
+.form-group.full-width { grid-column: 1 / -1; }
+
+label {
+  font-size: 0.70rem;
+  font-weight: 600;
+  color: var(--text-label);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="date"],
+select,
+textarea {
+  width: 100%;
+  padding: 9px 12px;
+  background-color: var(--bg-input);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: var(--text-hi);
+  transition: border-color 0.14s, box-shadow 0.14s;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(27,79,216,0.12);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-lo);
+  font-weight: 400;
+}
+
+select option {
+  background-color: #ffffff;
+  color: var(--text-hi);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 68px;
+  line-height: 1.55;
+}
+
+.form-actions {
+  display: flex;
+  gap: var(--s3);
+  margin-top: var(--s4);
+  flex-wrap: wrap;
+}
+
+/* ──────────────────────────────────────────────────────────
+   情報バナー
+   ────────────────────────────────────────────────────────── */
+.info-banner {
+  padding: 14px var(--s5);
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+  background-color: var(--bg-raised);
+  font-size: 0.84rem;
+  color: var(--text-md);
+  line-height: 1.65;
+  margin-bottom: var(--s5);
+}
+.info-banner strong {
+  color: var(--text-hi);
+  font-weight: 600;
+}
+
+.info-banner-yellow {
+  background-color: var(--gold-dim);
+  border-color: rgba(176,125,16,0.25);
+}
+
+/* ──────────────────────────────────────────────────────────
+   総資産表示ピル
+   ────────────────────────────────────────────────────────── */
+.total-display {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  padding: 7px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-pill);
+  font-size: 0.84rem;
+  color: var(--text-md);
+  font-weight: 400;
+  background-color: var(--bg-card);
+}
+.total-display span {
+  font-weight: 700;
+  color: var(--text-hi);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* ──────────────────────────────────────────────────────────
+   投資信託カード（シミュレーション）
+   ────────────────────────────────────────────────────────── */
+.fund-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(275px, 1fr));
+  gap: var(--s4);
+  margin-bottom: var(--s4);
+}
+
+.fund-card {
+  background-color: var(--bg-card);
+  border: 1.5px solid var(--border);
+  border-left-width: 3px;
+  border-left-color: var(--blue);
+  border-radius: var(--r);
+  padding: 18px var(--s5);
+  transition: box-shadow 0.14s, border-color 0.14s;
+}
+.fund-card:hover {
+  box-shadow: var(--shadow-hover);
+  border-color: var(--border-em);
+}
+
+.fund-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--s3);
+  margin-bottom: var(--s4);
+}
+
+.fund-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-hi);
+  line-height: 1.4;
+}
+
+.fund-actions {
+  display: flex;
+  gap: var(--s2);
+  flex-shrink: 0;
+}
+
+.fund-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s3);
+}
+
+.fund-stat-label {
+  font-size: 0.63rem;
+  font-weight: 500;
+  color: var(--text-lo);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: var(--s1);
+}
+
+.fund-stat-value {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-hi);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.return-rate { color: var(--positive); }
+
+.fund-note {
+  margin-top: var(--s3);
+  padding-top: var(--s3);
+  border-top: 1px solid var(--border);
+  font-size: 0.75rem;
+  color: var(--text-lo);
+  line-height: 1.5;
+}
+
+/* ──────────────────────────────────────────────────────────
+   シミュレーション結果カード
+   ────────────────────────────────────────────────────────── */
+.sim-result-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: var(--s4);
+  margin-bottom: var(--s5);
+}
+
+.sim-result-card {
+  background-color: var(--bg-card);
+  border: 1.5px solid var(--border);
+  border-left: 3px solid var(--blue);
+  border-radius: var(--r);
+  padding: var(--s5) var(--s6);
+  box-shadow: var(--shadow-card);
+}
+
+.sim-result-label {
+  font-size: 0.66rem;
+  font-weight: 600;
+  color: var(--text-label);
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  margin-bottom: var(--s2);
+}
+
+.sim-result-value {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-hi);
+  letter-spacing: -0.025em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+.sim-result-value.green { color: var(--positive); }
+
+/* ──────────────────────────────────────────────────────────
+   推移ページ
+   ────────────────────────────────────────────────────────── */
+.diff-positive {
+  color: var(--positive);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.diff-negative {
+  color: var(--negative);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+#historySummary {
+  display: flex;
+  align-items: center;
+  gap: var(--s5);
+  flex-wrap: wrap;
+  padding: 12px var(--s5);
+  background-color: var(--bg-card);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  margin-bottom: var(--s5);
+  font-size: 0.84rem;
+  color: var(--text-md);
+  box-shadow: var(--shadow-card);
+}
+
+/* ──────────────────────────────────────────────────────────
+   空データメッセージ
+   ────────────────────────────────────────────────────────── */
+.empty-message {
+  padding: var(--s8) var(--s6);
+  text-align: center;
+  color: var(--text-lo);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+/* ──────────────────────────────────────────────────────────
+   トースト通知
+   ────────────────────────────────────────────────────────── */
+.toast {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 9999;
+  max-width: 320px;
+  padding: 11px 17px;
+  border-radius: var(--r-sm);
+  font-size: 0.84rem;
+  font-weight: 500;
+  border: 1.5px solid var(--border-em);
+  opacity: 0;
+  transform: translateX(16px);
+  transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.34, 1.4, 0.64, 1);
+  box-shadow: 0 4px 16px rgba(30,40,80,0.12);
+}
+
+.toast-success {
+  background-color: #f0fdf9;
+  border-color: var(--teal);
+  color: var(--teal);
+}
+.toast-warning {
+  background-color: #fffbf0;
+  border-color: var(--gold);
+  color: #7a5a00;
+}
+.toast-show { opacity: 1; transform: translateX(0); }
+
+/* ──────────────────────────────────────────────────────────
+   区切り線
+   ────────────────────────────────────────────────────────── */
+.section-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: var(--s6) 0;
+}
+
+/* ──────────────────────────────────────────────────────────
+   シミュレーション専用
+   ────────────────────────────────────────────────────────── */
+.fund-inline-input {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-xs);
+  font-size: 0.84rem;
+  font-family: inherit;
+  font-weight: 600;
+  color: var(--text-hi);
+  background: var(--bg-base);
+  font-variant-numeric: tabular-nums;
+  transition: border-color 0.14s, box-shadow 0.14s;
+}
+.fund-inline-input:focus {
+  outline: none;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 2px rgba(27,79,216,0.10);
+  background: var(--bg-card);
+}
+
+.fund-save-row {
+  margin-top: var(--s3);
+  padding-top: var(--s3);
+  border-top: 1px solid var(--border);
+}
+
+.sim-empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: var(--s10) var(--s6);
+}
+.sim-empty-text {
+  color: var(--text-lo);
+  font-size: 0.875rem;
+  margin-bottom: var(--s4);
+}
+
+/* ──────────────────────────────────────────────────────────
+   スクロールバー（Chromium）
+   ────────────────────────────────────────────────────────── */
+::-webkit-scrollbar        { width: 6px; height: 6px; }
+::-webkit-scrollbar-track  { background: var(--bg-base); }
+::-webkit-scrollbar-thumb  { background-color: var(--border-em); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background-color: var(--text-lo); }
+
+/* ──────────────────────────────────────────────────────────
+   レスポンシブ — iPad (768px〜1024px)
+   ────────────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .container { padding: var(--s6) var(--s6) 70px; }
+  .summary-cards { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ──────────────────────────────────────────────────────────
+   レスポンシブ — スマホ (〜768px)
+   ────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  /* ナビ: 横スクロール可能に */
+  .navbar {
+    padding: 0 var(--s4);
+    gap: var(--s3);
+  }
+  .nav-brand { font-size: 0.85rem; }
+  .nav-links {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 2px;
+    -ms-overflow-style: none;
+  }
+  .nav-links::-webkit-scrollbar { display: none; }
+  .nav-links a {
+    white-space: nowrap;
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+
+  .container { padding: var(--s4) var(--s4) 60px; }
+
+  .card { padding: var(--s4); }
+
+  .card-value { font-size: 1.5rem; }
+  .card-label { font-size: 0.68rem; }
+
+  .summary-cards { grid-template-columns: 1fr 1fr; gap: var(--s3); }
+
+  .charts-grid { grid-template-columns: 1fr; }
+
+  .chart-wrapper { height: 180px; }
+  .chart-container-lg { height: 280px; }
+
+  /* テーブル: 小さい画面でも読みやすく */
+  .asset-table th,
+  .asset-table td { padding: 8px 10px; font-size: 0.8rem; }
+
+  /* フォーム */
+  .form-grid { grid-template-columns: 1fr; }
+  .form-group.full-width { grid-column: 1; }
+
+  /* ボタン: タッチターゲット確保 */
+  .btn { min-height: 44px; }
+  .btn-sm { min-height: 36px; }
+
+  /* シミュレーション */
+  .fund-stats { grid-template-columns: 1fr 1fr; }
+  .sim-result-cards { grid-template-columns: 1fr 1fr; }
+  .mc-scenario-cards { grid-template-columns: 1fr 1fr !important; }
+
+  /* 推移グラフ */
+  #historySummary { gap: var(--s3); font-size: 0.8rem; }
+}
+
+/* ──────────────────────────────────────────────────────────
+   レスポンシブ — 小型スマホ (〜480px)
+   ────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .nav-brand { display: none; }
+  .summary-cards { grid-template-columns: 1fr 1fr; }
+  .card-value { font-size: 1.3rem; }
+  .sim-result-cards { grid-template-columns: 1fr 1fr; }
+  .fund-stats { grid-template-columns: 1fr; }
+  .mc-scenario-cards { grid-template-columns: 1fr 1fr !important; }
+  .page-title { font-size: 1rem; }
+  .page-header { margin-bottom: var(--s4); }
+}
+
+/* ──────────────────────────────────────────────────────────
+   ユーティリティ
+   ────────────────────────────────────────────────────────── */
+.is-hidden { display: none !important; }
+
+.required-mark { color: var(--rose); }
+
+.card-value--sm {
+  font-size: 1rem !important;
+  letter-spacing: 0 !important;
+}
+
+/* 操作ボタン行 */
+.action-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: var(--s5);
+}
+
+/* 投資信託ヒントバナー */
+.fund-hint-banner {
+  margin-top: 12px;
+  margin-bottom: 0;
+}
+
+/* ──────────────────────────────────────────────────────────
+   シミュレーション — レイアウト補助
+   ────────────────────────────────────────────────────────── */
+.sim-fund-note {
+  font-size: 0.82rem;
+  color: var(--text-md);
+  margin-bottom: var(--s4);
+}
+
+.sim-controls-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-bottom: var(--s4);
+}
+
+.sim-param-group {
+  flex: 0 0 200px;
+  margin: 0;
+}
+
+.btn-run { padding: 11px 32px; }
+
+.sim-disclaimer {
+  color: var(--text-lo);
+  font-size: 0.8rem;
+  line-height: 1.7;
+}
+
+.chart-container-xl { height: 440px; }
+
+/* ──────────────────────────────────────────────────────────
+   カテゴリーバッジ定義カラー（インラインstyle排除）
+   ────────────────────────────────────────────────────────── */
+.badge-cash        { background: rgba(61,126,255,0.08);  color: #3d7eff; border-color: rgba(61,126,255,0.30); }
+.badge-stock       { background: rgba(0,201,167,0.08);   color: #00c9a7; border-color: rgba(0,201,167,0.30); }
+.badge-fund        { background: rgba(240,165,0,0.08);   color: #f0a500; border-color: rgba(240,165,0,0.30); }
+.badge-real-estate { background: rgba(155,121,245,0.08); color: #9b79f5; border-color: rgba(155,121,245,0.30); }
+.badge-crypto      { background: rgba(255,74,110,0.08);  color: #ff4a6e; border-color: rgba(255,74,110,0.30); }
+.badge-other       { background: rgba(106,128,168,0.08); color: #6a80a8; border-color: rgba(106,128,168,0.30); }
+
+/* ──────────────────────────────────────────────────────────
+   モンテカルロ — チャート凡例
+   ────────────────────────────────────────────────────────── */
+.mc-band-legend {
+  display: flex;
+  align-items: center;
+  gap: var(--s5);
+  flex-wrap: wrap;
+  margin-bottom: var(--s4);
+}
+
+.mc-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.75rem;
+  color: var(--text-md);
+  font-weight: 500;
+}
+
+.mc-legend-swatch {
+  display: inline-block;
+  width: 28px;
+  height: 10px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.mc-swatch-outer  { background: rgba(37,99,235,0.15); border: 1px dashed rgba(37,99,235,0.45); }
+.mc-swatch-inner  { background: rgba(37,99,235,0.26); border: 1px solid  rgba(37,99,235,0.45); }
+.mc-swatch-median { background: #1b4fd8; height: 3px; margin: 3px 0; border-radius: 2px; }
+
+.mc-nsims-note {
+  font-size: 0.75rem;
+  color: var(--text-lo);
+  margin-top: var(--s3);
+  line-height: 1.6;
+  min-height: 1.2em;
+}
+
+/* ──────────────────────────────────────────────────────────
+   モンテカルロ — シナリオカード
+   ────────────────────────────────────────────────────────── */
+.mc-scenario-section {
+  margin-top: var(--s2);
+}
+
+.mc-scenario-heading {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-label);
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  margin-bottom: var(--s4);
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+}
+.mc-scenario-heading::before {
+  content: '';
+  display: block;
+  width: 3px;
+  height: 12px;
+  background: linear-gradient(180deg, var(--blue-lt) 0%, var(--blue) 100%);
+  border-radius: 2px;
+}
+
+.mc-scenario-cards {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--s3);
+  margin-bottom: var(--s5);
+}
+
+.mc-scenario-card {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border);
+  border-top-width: 3px;
+  border-radius: var(--r);
+  padding: var(--s4) var(--s4) var(--s3);
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.15s;
+}
+.mc-scenario-card:hover { box-shadow: var(--shadow-hover); }
+
+.mc-scenario-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-label);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: var(--s2);
+}
+
+.mc-scenario-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-hi);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin-bottom: var(--s1);
+}
+
+.mc-scenario-prob {
+  font-size: 0.68rem;
+  color: var(--text-lo);
+  font-weight: 400;
+}
+
+/* 色分け — 日本の金融UI（上昇=赤、下落=ティール） */
+.mc-scenario-bad   { border-top-color: var(--negative); }
+.mc-scenario-lower { border-top-color: var(--gold-lt); }
+.mc-scenario-mid   { border-top-color: var(--blue-lt); }
+.mc-scenario-upper { border-top-color: rgba(224,48,96,0.55); }
+.mc-scenario-good  { border-top-color: var(--positive); }
+
+.mc-scenario-mid .mc-scenario-value   { color: var(--blue); }
+.mc-scenario-good .mc-scenario-value  { color: var(--positive); }
+.mc-scenario-bad .mc-scenario-value   { color: var(--negative); }
+
+@media (max-width: 1024px) {
+  .mc-scenario-cards { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ──────────────────────────────────────────────────────────
+   東証 マーケットステータス（リアルタイム）
+   ────────────────────────────────────────────────────────── */
+.market-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.74rem;
+  font-weight: 500;
+  padding: 4px 11px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--border);
+  color: var(--text-lo);
+  transition: color 0.3s, border-color 0.3s, background-color 0.3s;
+}
+
+.market-status::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-lo);
+  flex-shrink: 0;
+  transition: background-color 0.3s;
+}
+
+.market-status.open {
+  color: var(--teal);
+  border-color: rgba(13,125,108,0.30);
+  background: var(--teal-dim);
+}
+
+.market-status.open::before {
+  background: var(--teal);
+  will-change: transform, opacity;
+  animation: market-pulse 2s ease-in-out infinite;
+}
+
+@keyframes market-pulse {
+  0%   { transform: scale(1);   opacity: 1;   }
+  50%  { transform: scale(1.5); opacity: 0.5; }
+  100% { transform: scale(1);   opacity: 1;   }
+}
+
+/* ──────────────────────────────────────────────────────────
+   ポートフォリオ健全度スコア
+   ────────────────────────────────────────────────────────── */
+.page-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  flex-wrap: wrap;
+}
+
+.health-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 4px 11px;
+  border-radius: var(--r-pill);
+  border: 1px solid;
+  transition: all 0.3s;
+}
+
+.health-badge.score-good { color: var(--teal);  border-color: rgba(13,125,108,0.30); background: var(--teal-dim); }
+.health-badge.score-warn { color: var(--gold);  border-color: rgba(176,125,16,0.30); background: var(--gold-dim); }
+.health-badge.score-bad  { color: var(--rose);  border-color: rgba(192,41,74,0.30);  background: var(--rose-dim); }
+.health-badge.score-none { color: var(--text-lo); border-color: var(--border); background: transparent; }
